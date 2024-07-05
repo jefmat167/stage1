@@ -1,7 +1,10 @@
 import express , { Request, Response } from 'express';
+import { config } from 'dotenv';
 import axios from 'axios';
 const reqIp = require('request-ip');
 const geoip = require('geoip-lite');
+
+config();
 
 
 const app = express();
@@ -16,9 +19,9 @@ app.get('/api/hello', async (req: Request, res: Response) => {
      const {visitor_name} = req.query;
      const ip = reqIp.getClientIp(req);
      const geo = geoip.lookup(ip);
-     const url = `https://api.weatherapi.com/v1/current.json?key=dc11be73337842fd9e8133938240507&q=${geo.city}&aqi=yes`
+     const url = `https://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${geo.city}&aqi=yes`
      const resp = await axios.get(url);
-     return res.send({
+     return res.status(200).send({
          client_ip: `${ip}`,
          location: `${geo.city}`, 
          greeting: `Hello, ${visitor_name}!, the temperature is ${resp.data.current.temp_c} degrees Celcius in ${geo.city}`
